@@ -132,3 +132,4 @@ dmypy.json
 
 # Microsoft excel files
 .xls
+%SystemDrive%/ProgramData/Microsoft/Windows/Caches/

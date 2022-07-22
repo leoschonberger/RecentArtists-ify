@@ -1,6 +1,11 @@
+import datetime
+
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from xlwt import Workbook
+
+LINE_LIMIT = 255
+NUMBER_OF_ARTISTS = 100
 
 scope = 'user-library-read'
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
@@ -24,7 +29,7 @@ def check_counted(track):
         # print('New Artist Found!')
 
 
-def get_data():
+def get_data() -> artists_list:
     print('Retrieving Data...')
     results = sp.current_user_saved_tracks()
     get_tracks(results)
@@ -42,21 +47,27 @@ def create_sheet():
     data = get_data()
 
     print('Formatting Data...')
-    for artist_i in range(check_exceed_line_limit()):
+    for artist_i in range(set_range(artists_list)):
         s1.write(artist_i, 0, data[artist_i])
 
     print("Done!")
-    wb.save('Top artists.xls')
+    wb.save(f'Top artists {create_timestamp()}.xls')
+
+
+def create_timestamp() -> str:
+    time = str(datetime.datetime.now())
+    # time = time.replace(' ', '')
+    time = time.replace(':', '-')
+    return time
 
 
 # TODO: xlwt has a backwards compatibility limitation of 256 rows per
-#       column. Microsoft Dumb.
-
-def check_exceed_line_limit():
-    if len(artists_list) >= 255:
-        return 255
-    else:
+#       column. Microsoft Dumb. Good thing we only need 100.
+def set_range(artists_list: artists_list) -> int:
+    if len(artists_list) < NUMBER_OF_ARTISTS:
         return len(artists_list)
+    else:
+        return NUMBER_OF_ARTISTS
 
 
 # Make sure to set your ENV vars
